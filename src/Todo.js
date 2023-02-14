@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 
 const Todo = ({todo})=> {
-	const log = console.log;
 	const del = useRef(null);
 	const add = useRef(null);
 	const inp = useRef("");
@@ -13,13 +12,13 @@ const Todo = ({todo})=> {
 	    let li = document.querySelectorAll('.collection-item');	
 			li.forEach((e)=> {
 					e.style.transition='.3s';
-					/*e.onclick =()=>
+					e.onclick =()=>
 						{
 							e.classList.toggle('cyan');
 							e.classList.toggle('white-text');
-							e.classList.contains('cyan') ? array.push(e.innerText) : 
+							e.classList.contains('cyan') ? array.push(Number(e.id)) : 
 							array.filter((a,idx)=> {
-								return a === e.innerText && array.splice(idx,1)
+								return a === e.id && array.splice(idx,1)
 							})
 							let arr = [];
 							li.forEach(e=>
@@ -29,44 +28,51 @@ const Todo = ({todo})=> {
 									arr.includes('cyan') ? 
 										del.current.removeAttribute('disabled') :
 										del.current.setAttribute('disabled','disabled')
-						}*/
-					let px = 0;
+						}
+
+					let px =  0;
 					let pw = 0;
-					let ml;
-					e.onmousedown=(el)=> {						
-						px = el.clientX;
+					let ml; 
+					e.onmousedown=(el)=> {
 						el = el || window.event;
 						el.preventDefault();
-						document.onmousemove=(d)=> {
-							e.classList.replace('cyan','red');
+						e.style.transition='';
+						px = el.clientX;
+					document.onmousemove=(d)=> {
 							d = d || window.event;
 							d.preventDefault();
 							pw = px - d.clientX;
+							px = d.clientX;
 							ml = e.offsetLeft - pw;
 							e.style.left = ml + 'px';
-							log(ml)
-							if (ml > 100) {	
-								e.classList.add('red');									
-							}else {
-								e.classList.replace('red','cyan');	
-								e.style.left = '0px';
+							if (ml > 100) {
+								e.classList.contains('cyan') ? e.classList.replace('cyan','red') : e.classList.add('red','white-text')
 							}
 						}
-						document.onmouseup = ()=>{
+						document.onmouseup = ()=> {
 							document.onmouseup = null;
     						document.onmousemove = null;
-    						if (ml > 100){
+    						if (ml > 100) {
 	    						e.style.left = '100%';
 										setTimeout(()=>
 											e.remove()
 											,300)
-								}
-						};
-					}
+								
+								let obj = todoList;
+								obj = obj.filter(f=> f.id !== Number(e.id))
+								array.length && array.filter((a,idx)=> {
+									return a === Number(e.id) && array.splice(idx,1)
+								})
+								setTodo(obj)
+								} else {
+									e.classList.replace('red','cyan')
+									e.style.left = '0px';
+							}
+						}; 
+						}
 					})
-					
-
-		})()					
+				
+		})()
 		del.current.onclick = ()=> {
 			todoList.length ? (
 				document.querySelectorAll('.collection-item').forEach((e)=> 
@@ -75,8 +81,8 @@ const Todo = ({todo})=> {
 		                        		e.classList.replace('cyan','red');
 	                        			setTimeout(()=> e.remove(),300)
 	                        			let obj = todoList
-	                        			array.filter((a,idx)=> {
-	                        				return obj = obj.filter(f=> f.content !== a)
+	                        			array.filter(a=> {
+	                        				return obj = obj.filter(f=> f.id !== a)
 										})
                         				setTodo(obj)
                         				setArray([])
@@ -91,9 +97,8 @@ const Todo = ({todo})=> {
         												content:inp.current.value
         											};
         											setTodo([...todoList,list])
-        										})() : alert(':0'))()
+        										})() : alert('Add something!'))()
         				inp.current.value = ""
-        				log(todoList)
         }
 	})
 	return (
@@ -111,12 +116,12 @@ const Todo = ({todo})=> {
 		<div className="collection">
 				{todoList.length ? todoList.map((t)=> {
 									return (
-										<div key={t.id} className="collection-item" style={{position:"relative"}}>
+										<div key={t.id} id={t.id} className="collection-item" style={{position:"relative"}}>
 											<p>{t.content}</p>
 										</div>
 										)
 									}
-								) : <p>Empty List</p>
+								) : <p>Empty Work!</p>
 				}
 		</div>
 		
